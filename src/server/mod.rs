@@ -4,6 +4,8 @@ use state::ServerState;
 pub(crate) mod catchers;
 pub(crate) mod fairings;
 pub(crate) mod guards;
+pub(crate) mod responses;
+pub(crate) mod routes;
 pub(crate) mod state;
 
 pub(crate) struct Server {

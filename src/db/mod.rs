@@ -5,7 +5,7 @@ enum DBAction {
     Select,
 }
 
-struct DB {
+pub struct DB {
     connection: String,
     command: Option<Command>,
 }
@@ -19,7 +19,7 @@ struct Command {
 }
 
 impl Command {
-    fn new(action: DBAction) -> Self {
+    pub fn new(action: DBAction) -> Self {
         Command {
             action,
             table: None,
@@ -55,7 +55,7 @@ impl DB {
     //     DB
     // }
 
-    fn new(connection: String) -> Self {
+    pub fn new(connection: String) -> Self {
         DB {
             connection,
             command: None,
