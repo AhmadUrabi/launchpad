@@ -1,7 +1,10 @@
 use rocket::{Ignite, Rocket};
 use state::ServerState;
 
+use crate::db::DB;
+
 pub(crate) mod catchers;
+pub(crate) mod controllers;
 pub(crate) mod fairings;
 pub(crate) mod guards;
 pub(crate) mod responses;
@@ -15,7 +18,7 @@ pub(crate) struct Server {
 impl Server {
     pub fn init() -> Self {
         let routes = routes![];
-        let state = ServerState { db: "".to_owned() };
+        let state = ServerState { db: DB::init() };
         let rocket = rocket::build()
             .attach(fairings::cors::CORS)
             .register("/", catchers![catchers::not_found])

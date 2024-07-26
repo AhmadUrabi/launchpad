@@ -2,6 +2,7 @@
 extern crate rocket;
 
 pub(crate) mod db;
+pub(crate) mod models;
 pub(crate) mod server;
 
 #[rocket::main]
