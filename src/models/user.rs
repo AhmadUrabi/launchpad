@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::mysql::Mysql))]
 pub struct User {
+    pub id: u64,
     pub name: String,
     pub email: String,
     pub role: String,

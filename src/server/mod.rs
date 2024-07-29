@@ -21,7 +21,7 @@ impl Server {
             routes::authentication::login,
             routes::authentication::register
         ];
-        let state = ServerState { db: DB::init() };
+        let state = ServerState {};
         let rocket = rocket::build()
             .attach(fairings::cors::CORS)
             .register("/", catchers![catchers::not_found])
