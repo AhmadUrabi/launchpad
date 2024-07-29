@@ -2,20 +2,20 @@ use serde::Serialize;
 
 // TODO: Implement Responders
 // TODO: Implement Error Handling
-pub enum ApiOk<T>
-where
-    T: Serialize,
-{
-    Success(T),
-    Created(T),
-}
+// pub enum ApiOk<T>
+// where
+//     T: Serialize,
+// {
+//     Success(T),
+//     Created(T),
+// }
 
-pub enum ApiError {
-    Unauthorized,
-    BadRequest,
-    NotFound,
-    InternalServerError,
-}
+// pub enum ApiError {
+//     Unauthorized,
+//     BadRequest,
+//     NotFound,
+//     InternalServerError,
+// }
 
 #[derive(Serialize)]
 pub struct Response {

@@ -6,21 +6,21 @@
 //     Select,
 // }
 
-#[derive(Debug, Clone)]
-pub struct DB {
-    connection: String,
-    // command: Option<Command>,
-}
+// #[derive(Debug, Clone)]
+// pub struct DB {
+//     connection: String,
+//     // command: Option<Command>,
+// }
 
-impl DB {
-    pub fn init() -> Self {
-        DB {
-            // Example connection string
-            connection: "postgres://postgres:password@localhost:5432/postgres".to_string(),
-            // command: None
-        }
-    }
-}
+// impl DB {
+//     pub fn init() -> Self {
+//         DB {
+//             // Example connection string
+//             connection: "postgres://postgres:password@localhost:5432/postgres".to_string(),
+//             // command: None
+//         }
+//     }
+// }
 
 // #[derive(Debug, Clone)]
 // pub struct Command {

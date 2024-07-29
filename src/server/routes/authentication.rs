@@ -1,17 +1,13 @@
 use diesel::prelude::*;
 
-use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
+use jsonwebtoken::{encode, EncodingKey, Header};
 use rocket::{serde::json::Json, State};
 
 use rocket::http::{Cookie, CookieJar};
 
 use crate::{
     models::user::User,
-    server::{
-        controllers::auth_controller::Claims,
-        responses::{ApiOk, Response},
-        state::ServerState,
-    },
+    server::{controllers::auth_controller::Claims, responses::Response, state::ServerState},
 };
 
 #[derive(serde::Deserialize)]
@@ -27,14 +23,13 @@ pub async fn login(
     cookies: &CookieJar<'_>,
 ) -> Json<Response> {
     use crate::schema::users::dsl::*;
-    // let db = &state.db.clone();
-    //
-    let connection = std::env::var("DATABASE_URL").unwrap();
-    let mut connection = MysqlConnection::establish(&connection).unwrap();
+
+    let connection = &mut state.pool.get().unwrap();
+
     let user = users
         .filter(email.eq(login.0.email))
         .select(User::as_select())
-        .first::<User>(&mut connection);
+        .first::<User>(connection);
 
     match user {
         Ok(user) => {
@@ -83,9 +78,9 @@ pub struct RegisterParams {
 #[post("/register", data = "<register>")]
 pub async fn register(state: &State<ServerState>, register: Json<RegisterParams>) -> String {
     use crate::schema::users::dsl::*;
-    // let db = &state.db.clone();
-    let connection = std::env::var("DATABASE_URL").unwrap();
-    let mut connection = MysqlConnection::establish(&connection).unwrap();
+
+    let connection = &mut state.pool.get().unwrap();
+
     // TODO: Check id error
     let user = User {
         id: 0,
@@ -97,7 +92,7 @@ pub async fn register(state: &State<ServerState>, register: Json<RegisterParams>
 
     diesel::insert_into(users)
         .values(&user)
-        .execute(&mut connection)
+        .execute(connection)
         .unwrap();
 
     return "Register successful".to_owned();

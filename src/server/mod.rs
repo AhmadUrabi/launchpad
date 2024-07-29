@@ -1,8 +1,6 @@
 use rocket::{Ignite, Rocket};
 use state::ServerState;
 
-use crate::db::DB;
-
 pub(crate) mod catchers;
 pub(crate) mod controllers;
 pub(crate) mod fairings;
@@ -21,12 +19,15 @@ impl Server {
             routes::authentication::login,
             routes::authentication::register
         ];
-        let state = ServerState {};
+
+        let state = ServerState::new();
+
         let rocket = rocket::build()
             .attach(fairings::cors::CORS)
             .register("/", catchers![catchers::not_found])
             .manage(state)
             .mount("/api", routes);
+
         Self { server: rocket }
     }
 
