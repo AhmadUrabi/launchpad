@@ -17,7 +17,10 @@ pub(crate) struct Server {
 
 impl Server {
     pub fn init() -> Self {
-        let routes = routes![];
+        let routes = routes![
+            routes::authentication::login,
+            routes::authentication::register
+        ];
         let state = ServerState { db: DB::init() };
         let rocket = rocket::build()
             .attach(fairings::cors::CORS)
