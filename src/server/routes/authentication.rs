@@ -5,6 +5,7 @@ use rocket::{serde::json::Json, State};
 
 use rocket::http::{Cookie, CookieJar};
 
+use crate::traits::CRUD;
 use crate::{
     models::user::User,
     server::{controllers::auth_controller::Claims, responses::Response, state::ServerState},
@@ -18,53 +19,40 @@ pub struct LoginParams {
 
 #[post("/login", data = "<login>")]
 pub async fn login(
-    state: &State<ServerState>,
+    state: &State<ServerState<MysqlConnection>>,
     login: Json<LoginParams>,
     cookies: &CookieJar<'_>,
 ) -> Json<Response> {
-    use crate::schema::users::dsl::*;
-
     let connection = &mut state.pool.get().unwrap();
+    let user_list = User::all(connection).unwrap();
 
-    let user = users
-        .filter(email.eq(login.0.email))
-        .select(User::as_select())
-        .first::<User>(connection);
+    let user = user_list
+        .iter()
+        .find(|u| u.email == login.0.email && u.password == login.0.password);
 
-    match user {
-        Ok(user) => {
-            // Serialize user to text
-            if user.password == login.0.password {
-                let claims = Claims::generate_from_user(user);
-                let token = encode(
-                    &Header::default(),
-                    &claims,
-                    &EncodingKey::from_secret("secret".as_ref()),
-                )
-                .unwrap();
-                let cookie = Cookie::build(("Authorization", format!("Bearer {}", token.clone())))
-                    .path("/")
-                    .secure(true)
-                    .http_only(true);
-                cookies.add(cookie);
-                return Json(Response {
-                    status: "success".to_owned(),
-                    message: None,
-                });
-            } else {
-                return Json(Response {
-                    status: "error".to_owned(),
-                    message: Some("Invalid password".to_owned()),
-                });
-            }
-        }
-        Err(_) => {
-            return Json(Response {
-                status: "error".to_owned(),
-                message: Some("User not found".to_owned()),
-            });
-        }
+    if user.is_none() {
+        return Json(Response {
+            status: "Failed".to_owned(),
+            message: Some("Invalid email or password".to_owned()),
+        });
     }
+
+    let user = user.unwrap();
+
+    let claims = Claims::generate_from_user(user);
+    let token = encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret("secret".as_bytes()),
+    )
+    .unwrap();
+
+    cookies.add(Cookie::new("Authorization", token.clone()));
+
+    return Json(Response {
+        status: "Success".to_owned(),
+        message: Some(token),
+    });
 }
 
 #[derive(serde::Deserialize)]
@@ -76,7 +64,10 @@ pub struct RegisterParams {
 }
 
 #[post("/register", data = "<register>")]
-pub async fn register(state: &State<ServerState>, register: Json<RegisterParams>) -> String {
+pub async fn register(
+    state: &State<ServerState<MysqlConnection>>,
+    register: Json<RegisterParams>,
+) -> String {
     use crate::schema::users::dsl::*;
 
     let connection = &mut state.pool.get().unwrap();

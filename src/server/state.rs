@@ -1,26 +1,27 @@
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
+use diesel::r2d2::R2D2Connection;
 
-use diesel::MysqlConnection;
-
-pub(crate) struct ServerState {
-    pub pool: Pool<ConnectionManager<MysqlConnection>>,
+pub(crate) struct ServerState<C: R2D2Connection + 'static> {
+    pub pool: Pool<ConnectionManager<C>>,
 }
 
-impl ServerState {
-    pub fn new() -> Self {
-        let pool = Self::get_connection_pool();
-        Self { pool }
-    }
-
-    fn get_connection_pool() -> Pool<ConnectionManager<MysqlConnection>> {
-        let url = std::env::var("DATABASE_URL").unwrap();
-        let manager = ConnectionManager::<MysqlConnection>::new(url);
-        // Refer to the `r2d2` documentation for more methods to use
-        // when building a connection pool
-        Pool::builder()
-            .test_on_check_out(true)
-            .build(manager)
-            .expect("Could not build connection pool")
+impl<C> ServerState<C>
+where
+    C: R2D2Connection + 'static,
+{
+    pub fn new(database_url: &str) -> Result<Self, String> {
+        let manager = ConnectionManager::<C>::new(database_url);
+        let pool = Pool::builder().build(manager).unwrap();
+        Ok(Self { pool })
     }
 }
+
+// use rocket::fairing::AdHoc;
+// use rocket::Build;
+// use rocket::Rocket;
+// use rocket_db_pools::{Database, Poolable};
+
+// #[derive(Database)]
+// #[database("my_db")]
+// pub struct ServerState<C: Poolable>(pub rocket_db_pools::Pool<C>);

@@ -5,6 +5,7 @@ pub(crate) mod db;
 pub(crate) mod models;
 pub(crate) mod schema;
 pub(crate) mod server;
+pub(crate) mod traits;
 
 #[rocket::main]
 async fn main() {

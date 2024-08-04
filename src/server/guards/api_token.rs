@@ -4,7 +4,7 @@ use rocket::{
     Request,
 };
 
-pub struct ApiToken(String);
+pub struct ApiToken(pub String);
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for ApiToken {
@@ -12,9 +12,10 @@ impl<'r> FromRequest<'r> for ApiToken {
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         // TODO: Replace this with a proper authentication mechanism
-        let api_token = req.headers().get_one("X-API-TOKEN");
+        let api_token = req.cookies().get("Authorization");
+
         match api_token {
-            Some(token) => Outcome::Success(ApiToken(token.to_string())),
+            Some(token) => Outcome::Success(ApiToken(token.value().to_string())),
             None => Outcome::Error((Status::Unauthorized, ())),
         }
     }

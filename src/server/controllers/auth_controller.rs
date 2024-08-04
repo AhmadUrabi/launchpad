@@ -35,7 +35,7 @@ impl Claims {
         }
     }
 
-    pub fn generate_from_user(user: User) -> Self {
+    pub fn generate_from_user(user: &User) -> Self {
         let iat = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
@@ -45,8 +45,8 @@ impl Claims {
         let exp = iat + (24 * 3600);
         Self {
             id: user.id as usize,
-            name: user.name,
-            email: user.email,
+            name: user.name.clone(),
+            email: user.email.clone(),
             iat,
             exp,
         }

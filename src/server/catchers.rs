@@ -1,4 +1,4 @@
-use rocket::Request;
+use rocket::{Catcher, Request};
 
 #[catch(400)]
 pub fn bad_request(req: &Request) -> String {
@@ -23,4 +23,14 @@ pub fn not_found(req: &Request) -> String {
 #[catch(500)]
 pub fn internal_error(req: &Request) -> String {
     format!("Internal Error: {}", req.uri())
+}
+
+pub fn catchers() -> Vec<Catcher> {
+    catchers![
+        bad_request,
+        unauthorized,
+        forbidden,
+        not_found,
+        internal_error
+    ]
 }
