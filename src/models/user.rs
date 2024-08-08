@@ -1,8 +1,8 @@
-use diesel::{connection::LoadConnection, prelude::*};
+use diesel::prelude::*;
 
 use serde::{Deserialize, Serialize};
 
-use crate::traits::{Parameter, CRUD};
+use crate::traits::Model;
 
 #[derive(Insertable, Queryable, Selectable, Serialize, Deserialize, Clone)]
 #[diesel(table_name = crate::schema::users)]
@@ -15,55 +15,39 @@ pub struct User {
     pub password: String,
 }
 
-use diesel::mysql::Mysql;
-
-impl CRUD for User {
-    type Backend = Mysql;
-    fn all<C>(conn: &mut C) -> Result<Vec<Self>, String>
-    where
-        C: LoadConnection<Backend = Self::Backend>,
-    {
+impl Model for User {
+    const TABLE_NAME: &'static str = "users";
+    fn all() -> Result<Vec<Self>, String> {
         use crate::schema::users::dsl::*;
-
-        let result = users.select(User::as_select()).load::<User>(conn);
-
+        let mut conn = crate::db::get_conn();
+        let result = users.load::<User>(&mut conn);
         match result {
-            Ok(u) => Ok(u),
+            Ok(_users) => Ok(_users),
             Err(e) => Err(e.to_string()),
         }
     }
-
-    fn find_first<C>(conn: &mut C, id: i64) -> Result<Self, String>
-    where
-        C: LoadConnection<Backend = Self::Backend>,
-    {
+    fn find(query_id: u64) -> Result<Self, String> {
         use crate::schema::users::dsl::*;
-
-        let result = users.find(id).first::<User>(conn);
-
+        let mut conn = crate::db::get_conn();
+        let result = users.find(query_id).first::<User>(&mut conn);
         match result {
-            Ok(u) => Ok(u),
+            Ok(user) => Ok(user),
             Err(e) => Err(e.to_string()),
         }
     }
-
-    fn delete<C>(&self, conn: &mut C) -> Result<(), String>
-    where
-        C: LoadConnection<Backend = Self::Backend>,
-    {
+    fn create(data: Self) -> Result<Self, String> {
         use crate::schema::users::dsl::*;
-        let result = diesel::delete(users.find(self.id)).execute(conn);
-
+        let mut conn = crate::db::get_conn();
+        let result = diesel::insert_into(users).values(&data).execute(&mut conn);
         match result {
-            Ok(_) => Ok(()),
+            Ok(_) => Ok(data),
             Err(e) => Err(e.to_string()),
         }
     }
-
-    fn update<C>(&self, conn: &mut C, params: Vec<Parameter>) -> Result<(), String>
-    where
-        C: LoadConnection<Backend = Self::Backend>,
-    {
-        Ok(())
-    }
+    // fn update(&self, id: u64, params: Vec<Parameter>) -> Result<Self, String> {
+    //     Ok(())
+    // }
+    // fn delete(&self, id: u64) -> Result<(), String> {
+    //     Ok(())
+    // }
 }

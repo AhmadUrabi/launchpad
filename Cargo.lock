@@ -656,6 +656,7 @@ dependencies = [
  "diesel",
  "dotenv",
  "jsonwebtoken",
+ "lazy_static",
  "rocket",
  "rocket_db_pools",
  "serde",

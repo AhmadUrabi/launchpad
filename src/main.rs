@@ -10,6 +10,7 @@ pub(crate) mod traits;
 #[rocket::main]
 async fn main() {
     dotenv::dotenv().ok();
+
     let server = server::Server::init();
     match server.launch().await {
         Err(e) => println!("Error starting server: {}", e),

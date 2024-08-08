@@ -2,9 +2,12 @@ pub mod authentication;
 pub mod users;
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![
-        authentication::login,
-        authentication::register,
-        users::get_users
-    ]
+    let user_routes = users::routes();
+    let auth_routes = authentication::routes();
+
+    let mut routes = Vec::new();
+    routes.extend(user_routes);
+    routes.extend(auth_routes);
+
+    routes
 }

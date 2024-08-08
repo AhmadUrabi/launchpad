@@ -1,7 +1,6 @@
-use diesel::MysqlConnection;
 use rocket::{Ignite, Rocket};
-use routes::authentication;
-use state::ServerState;
+
+use crate::db;
 
 pub(crate) mod catchers;
 pub(crate) mod controllers;
@@ -20,13 +19,11 @@ impl Server {
         let routes = routes::routes();
         let catchers = catchers::catchers();
 
-        let database_url = std::env::var("DATABASE_URL").unwrap();
-        let state: ServerState<MysqlConnection> = ServerState::new(database_url.as_str()).unwrap();
+        *db::POOL.lock().unwrap() = Some(db::create_pool());
 
         let rocket = rocket::build()
             .attach(fairings::cors::CORS)
             .register("/", catchers)
-            .manage(state)
             .mount("/api", routes);
 
         Self { server: rocket }

@@ -1,25 +1,31 @@
-use diesel::connection::LoadConnection;
+use crate::models::user::User;
 
 pub struct Parameter {
     pub key: String,
     pub value: Option<String>,
 }
 
-pub trait CRUD: Sized {
-    type Backend;
-    fn all<C>(conn: &mut C) -> Result<Vec<Self>, String>
-    where
-        C: LoadConnection<Backend = Self::Backend>;
+pub trait Model: Sized {
+    const TABLE_NAME: &'static str;
+    fn all() -> Result<Vec<Self>, String>;
+    fn find(query_id: u64) -> Result<Self, String>;
+    fn create(data: Self) -> Result<Self, String>;
+    // fn update(&self, id: u64, params: Vec<Parameter>) -> Result<Self, String>;
+    // fn delete(&self, id: u64) -> Result<(), String>;
+}
 
-    fn find_first<C>(conn: &mut C, id: i64) -> Result<Self, String>
-    where
-        C: LoadConnection<Backend = Self::Backend>;
+pub trait Controller: Model {
+    fn index(&self) -> Result<(), String>;
+    fn show(&self, id: u64) -> Result<(), String>;
+    fn create(&self, params: Vec<Parameter>) -> Result<(), String>;
+    fn update(&self, id: u64, params: Vec<Parameter>) -> Result<(), String>;
+    fn delete(&self, id: u64) -> Result<(), String>;
+}
 
-    fn delete<C>(&self, conn: &mut C) -> Result<(), String>
-    where
-        C: LoadConnection<Backend = Self::Backend>;
-
-    fn update<C>(&self, conn: &mut C, params: Vec<Parameter>) -> Result<(), String>
-    where
-        C: LoadConnection<Backend = Self::Backend>;
+pub trait Permission: Model {
+    fn read(resource: Option<Self>, user: User) -> bool;
+    fn write(resource: Option<Self>, user: User) -> bool;
+    fn update(resource: Option<Self>, user: User) -> bool;
+    fn delete(resource: Option<Self>, user: User) -> bool;
+    fn custom(resource: Option<Self>, user: User, name: &'static str) -> bool;
 }

@@ -5,7 +5,7 @@ use rocket::{serde::json::Json, State};
 
 use rocket::http::{Cookie, CookieJar};
 
-use crate::traits::CRUD;
+use crate::traits::Model;
 use crate::{
     models::user::User,
     server::{controllers::auth_controller::Claims, responses::Response, state::ServerState},
@@ -17,14 +17,13 @@ pub struct LoginParams {
     pub password: String,
 }
 
+pub fn routes() -> Vec<rocket::Route> {
+    routes![login, register]
+}
+
 #[post("/login", data = "<login>")]
-pub async fn login(
-    state: &State<ServerState<MysqlConnection>>,
-    login: Json<LoginParams>,
-    cookies: &CookieJar<'_>,
-) -> Json<Response> {
-    let connection = &mut state.pool.get().unwrap();
-    let user_list = User::all(connection).unwrap();
+pub async fn login(login: Json<LoginParams>, cookies: &CookieJar<'_>) -> Json<Response> {
+    let user_list = User::all().unwrap();
 
     let user = user_list
         .iter()
@@ -64,13 +63,10 @@ pub struct RegisterParams {
 }
 
 #[post("/register", data = "<register>")]
-pub async fn register(
-    state: &State<ServerState<MysqlConnection>>,
-    register: Json<RegisterParams>,
-) -> String {
+pub async fn register(register: Json<RegisterParams>) -> String {
     use crate::schema::users::dsl::*;
 
-    let connection = &mut state.pool.get().unwrap();
+    let mut connection = crate::db::get_conn();
 
     // TODO: Check id error
     let user = User {
@@ -83,7 +79,7 @@ pub async fn register(
 
     diesel::insert_into(users)
         .values(&user)
-        .execute(connection)
+        .execute(&mut connection)
         .unwrap();
 
     return "Register successful".to_owned();
