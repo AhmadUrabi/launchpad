@@ -4,7 +4,7 @@ use crate::traits::Model;
 use rocket::serde::json::Json;
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![get_users, get_user_by_id]
+    routes![get_users, get_user_by_id, create_user]
 }
 
 #[get("/users")]
@@ -24,8 +24,13 @@ pub async fn get_user_by_id(id: u64, _token: ApiToken) -> Result<Json<User>, Str
 }
 
 #[post("/users", data = "<user>")]
-pub async fn create_user(user: Json<User>, _token: ApiToken) -> Result<Json<User>, String> {
-    match User::create(user.into_inner()) {
+pub async fn create_user(
+    user: Json<rocket::serde::json::Value>,
+    _token: ApiToken,
+) -> Result<Json<User>, String> {
+    println!("{:?}", user);
+
+    match User::create(my_user) {
         Ok(user) => Ok(Json(user)),
         Err(e) => Err(e.to_string()),
     }
