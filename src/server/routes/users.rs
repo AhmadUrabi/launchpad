@@ -27,10 +27,10 @@ pub async fn get_user_by_id(id: u64, _token: ApiToken) -> Result<Json<User>, Str
 pub async fn create_user(
     user: Json<rocket::serde::json::Value>,
     _token: ApiToken,
-) -> Result<Json<User>, String> {
+) -> Result<Json<String>, String> {
     println!("{:?}", user);
 
-    match User::create(my_user) {
+    match User::create(user) {
         Ok(user) => Ok(Json(user)),
         Err(e) => Err(e.to_string()),
     }

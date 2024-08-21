@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 
-use rocket::serde;
+use rocket::serde::{self, json::Json};
 use serde::{Deserialize, Serialize};
 
 use crate::traits::{Model, Parameter};
@@ -9,7 +9,7 @@ use crate::traits::{Model, Parameter};
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::mysql::Mysql))]
 pub struct User {
-    pub id: Option<u64>,
+    pub id: u64,
     pub name: String,
     pub email: String,
     pub role: String,
@@ -36,15 +36,21 @@ impl Model for User {
             Err(e) => Err(e.to_string()),
         }
     }
-    fn create(data: Vec<Parameter>) -> Result<Self, String> {
+    fn create(data: Json<rocket::serde::json::Value>) -> Result<String, String> {
         use crate::schema::users::dsl::*;
 
-        // TODO: Generate Object from JSON
+        let user = User {
+            id: 0,
+            name: data["name"].as_str().unwrap_or("").to_string(),
+            email: data["email"].as_str().unwrap_or("").to_string(),
+            role: data["role"].as_str().unwrap_or("").to_string(),
+            password: data["password"].as_str().unwrap_or("").to_string(),
+        };
 
         let mut conn = crate::db::get_conn();
-        let result = diesel::insert_into(users).values(&data).execute(&mut conn);
+        let result = diesel::insert_into(users).values(&user).execute(&mut conn);
         match result {
-            Ok(_) => Ok(data),
+            Ok(_) => Ok("User Created".to_string()),
             Err(e) => Err(e.to_string()),
         }
     }

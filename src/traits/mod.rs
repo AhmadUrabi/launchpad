@@ -1,10 +1,12 @@
+use rocket::serde::json::Json;
+
 use crate::models::user::User;
 
 pub trait Model: Sized {
     const TABLE_NAME: &'static str;
     fn all() -> Result<Vec<Self>, String>;
     fn find(query_id: u64) -> Result<Self, String>;
-    fn create(data: Vec<Parameter>) -> Result<Self, String>;
+    fn create(data: Json<rocket::serde::json::Value>) -> Result<String, String>;
     // fn update(&self, id: u64, params: Vec<Parameter>) -> Result<Self, String>;
     // fn delete(&self, id: u64) -> Result<(), String>;
 }
