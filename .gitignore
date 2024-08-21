@@ -1,2 +1,4 @@
 /target
 .env
+# Ignore any subdirectories named target
+**/target/

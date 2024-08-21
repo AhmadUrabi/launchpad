@@ -650,12 +650,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "launchpad"
+name = "launchpad-cli"
+version = "0.1.0"
+
+[[package]]
+name = "launchpad-macros"
+version = "0.1.0"
+
+[[package]]
+name = "launchpad-src"
 version = "0.1.0"
 dependencies = [
  "diesel",
  "dotenv",
  "jsonwebtoken",
+ "launchpad-macros",
  "lazy_static",
  "rocket",
  "rocket_db_pools",

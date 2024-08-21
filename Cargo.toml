@@ -1,15 +1,10 @@
-[package]
-name = "launchpad"
-authors = ["Ahmad Urabi"]
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["launchpad-src", "launchpad-cli", "launchpad-macros"]
+default-members = ["launchpad-src"]
+resolver = "2"
 
-[dependencies]
-diesel = { version = "2.2.2", features = ["mysql", "r2d2"] }
-dotenv = "0.15.0"
-jsonwebtoken = "9.3.0"
-lazy_static = "1.5.0"
-rocket = { version = "0.5.1", features = ["json"] }
-rocket_db_pools = "0.2.0"
-serde = { version = "1.0.204", features = ["derive"] }
-serde_json = "1.0.122"
+
+[workspace.dependencies]
+launchpad-src = { path = "launchpad-src" }
+launchpad-cli = { path = "launchpad-cli" }
+launchpad-macros = { path = "launchpad-macros" }
