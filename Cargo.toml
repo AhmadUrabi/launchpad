@@ -1,10 +1,9 @@
 [workspace]
-members = ["launchpad-src", "launchpad-cli", "launchpad-macros"]
-default-members = ["launchpad-src"]
+members = ["launchpad-cli", "launchpad-macros"]
+default-members = ["launchpad-cli"]
 resolver = "2"
 
 
 [workspace.dependencies]
-launchpad-src = { path = "launchpad-src" }
 launchpad-cli = { path = "launchpad-cli" }
 launchpad-macros = { path = "launchpad-macros" }
