@@ -1,11 +1,10 @@
 use include_dir::{include_dir, Dir};
-use std::fs::DirEntry;
 use std::path::Path;
 use std::{fs, process};
 
 use clap::Parser;
 
-static SRC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/launchpad-src");
+static SRC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/../launchpad-src");
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
