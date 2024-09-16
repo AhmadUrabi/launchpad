@@ -3,7 +3,10 @@ use diesel::prelude::*;
 use rocket::serde::{self, json::Json};
 use serde::{Deserialize, Serialize};
 
-use crate::traits::Model;
+use crate::{
+    server::guards::api_token::ApiToken,
+    traits::{Model, Permission},
+};
 
 #[derive(Insertable, Queryable, Selectable, Serialize, Deserialize, Clone)]
 #[diesel(table_name = crate::schema::users)]
@@ -60,4 +63,22 @@ impl Model for User {
     // fn delete(&self, id: u64) -> Result<(), String> {
     //     Ok(())
     // }
+}
+
+impl Permission for User {
+    fn read(resource: Option<Self>, user: User) -> bool {
+        true
+    }
+    fn write(resource: Option<Self>, user: User) -> bool {
+        true
+    }
+    fn update(resource: Option<Self>, user: User) -> bool {
+        true
+    }
+    fn delete(resource: Option<Self>, user: User) -> bool {
+        true
+    }
+    fn custom(resource: Option<Self>, user: User, name: &'static str) -> bool {
+        true
+    }
 }

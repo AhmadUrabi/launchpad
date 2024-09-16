@@ -6,11 +6,11 @@ use crate::models::user::User;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    id: usize,
-    name: String,
-    email: String,
-    iat: usize,
-    exp: usize,
+    pub id: usize,
+    pub name: String,
+    pub email: String,
+    pub iat: usize,
+    pub exp: usize,
 }
 
 impl Claims {

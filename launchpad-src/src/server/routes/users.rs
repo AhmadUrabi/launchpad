@@ -1,6 +1,6 @@
 use crate::models::user::User;
 use crate::server::guards::api_token::ApiToken;
-use crate::traits::Model;
+use crate::traits::{Model, Permission};
 use rocket::serde::json::Json;
 
 pub fn routes() -> Vec<rocket::Route> {
@@ -26,9 +26,11 @@ pub async fn get_user_by_id(id: u64, _token: ApiToken) -> Result<Json<User>, Str
 #[post("/users", data = "<user>")]
 pub async fn create_user(
     user: Json<rocket::serde::json::Value>,
-    _token: ApiToken,
+    token: ApiToken,
 ) -> Result<Json<String>, String> {
-    println!("{:?}", user);
+    if !(User::write(None, token.0)) {
+        return Err("No Perm".to_string());
+    }
 
     match User::create(user) {
         Ok(user) => Ok(Json(user)),
